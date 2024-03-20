@@ -1,5 +1,6 @@
 #include "Brave.h"
 #include "Game.h"
+#include "Maze.h"
 #include "Tile.h"
 #include "Treasure.h"
 #include "Maze.h"

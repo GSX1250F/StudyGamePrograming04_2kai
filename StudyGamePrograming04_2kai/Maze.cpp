@@ -48,7 +48,7 @@ void Maze::ResetMaze()
 	FindPath(GetEndTile(), GetStartTile());
 	UpdatePathTiles(GetStartTile());
 
-	GetGame()->shadow->SetPath();
+	//GetGame()->shadow->SetPath();
 }
 
 void Maze::InitMaze(bool gamestart)

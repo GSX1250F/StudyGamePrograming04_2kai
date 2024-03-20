@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "Maze.h"
 #include "Tile.h"
+#include "Treasure.h"
 #include "AnimSpriteComponent.h"
 #include "CircleComponent.h"
 #include "MoveComponent.h"
@@ -40,11 +41,11 @@ Shadow::Shadow(Game* game) : Actor(game)
 	cc->SetRadius(asc->GetTexWidth() / 2.0f);
 
 	//MoveComponent作成
-	//MoveComponent* mc = new MoveComponent(this);
+	MoveComponent* mc = new MoveComponent(this);
 
 	//NavComponent作成
-	nc = new NavComponent(this);
-	nc->SetForwardSpeed(150.0f);
+	//nc = new NavComponent(this);
+	//nc->SetForwardSpeed(150.0f);
 	
 	
 	//左手法のとき。初期方向は上
@@ -57,27 +58,28 @@ void Shadow::ActorInput(const uint8_t* keyState)
 	if (GetGame()->maze->gameStart == true) {
 		//入力に応じて、アニメーションの設定と移動
 		SetVelocity(Vector2::Zero);
+		float speed = 400.0f;
 		int bg = asc->GetAnimNumBeg();
 		int ed = asc->GetAnimNumLast();
 		if (ndir == 3)	//DOWN
 		{
 			if (bg != 1 || ed != 4) { asc->SetAnimNum(1, 4, true); }
-			SetVelocity(Vector2(0.0f, 200.0f));
+			SetVelocity(Vector2(0.0f, speed));
 		}
 		else if (ndir == 1)	//UP
 		{
 			if (bg != 5 || ed != 8) { asc->SetAnimNum(5, 8, true); }
-			SetVelocity(Vector2(0.0f, -200.0f));
+			SetVelocity(Vector2(0.0f, -speed));
 		}
 		else if (ndir == 0)	//RIGHT
 		{
 			if (bg != 9 || ed != 12) { asc->SetAnimNum(9, 12, true); }
-			SetVelocity(Vector2(200.0f, 0.0f));
+			SetVelocity(Vector2(speed, 0.0f));
 		}
 		else if (ndir == 2)	//LEFT
 		{
 			if (bg != 13 || ed != 16) { asc->SetAnimNum(13, 16, true); }
-			SetVelocity(Vector2(-200.0f, 0.0f));
+			SetVelocity(Vector2(-speed, 0.0f));
 		}
 	}
 }
@@ -85,42 +87,32 @@ void Shadow::ActorInput(const uint8_t* keyState)
 void Shadow::UpdateActor(float deltaTime)
 {
 	if (GetGame()->maze->gameStart == true) {
-		
-		/*
-		auto tiles = GetGame()->GetMaze()->GetTiles();
-		for (int i = 0; i < tiles.size(); i++)
-		{
-			for (int j = 0; j < tiles[i].size(); j++)
-			{
-				if (tiles[i][j]->GetTileState() == Tile::EWall)
-				{
-					//壁衝突判定
-					if (Intersect(*mCircle, *(tiles[i][j]->GetCircle())))
-					{
+		if (GetGame()->maze->gameStart == true) {
+			std::vector<std::vector<Tile*>> tiles = GetGame()->tiles;
+			for (int i = 0; i < tiles.size(); i++) {
+				for (int j = 0; j < tiles[i].size(); j++) {
+					if (tiles[i][j]->mTileState == Tile::EWall) {
+						//壁衝突判定
+						if (Intersect(*cc, *(tiles[i][j]->cc))) {
 
-						while (Intersect(*mCircle, *(tiles[i][j]->GetCircle())))
-						{
-							//位置を調整。差ベクトルのx,y成分の大きいほうを*とした分だけ離す
-							Vector2 n = this->GetPosition() - tiles[i][j]->GetPosition();
-							if (Math::Abs(n.x) >= Math::Abs(n.y)) { n = Vector2(n.x / Math::Abs(n.x), 0.0f); }
-							else { n = 1.0*Vector2(0.0f, n.y / Math::Abs(n.y)); }
-							this->SetPosition(this->GetPosition() + n);
+							while (Intersect(*cc, *(tiles[i][j]->cc))) {
+								//位置を調整。差ベクトルのx,y成分の大きいほうを1とした分だけ離す
+								Vector2 n = this->GetPosition() - tiles[i][j]->GetPosition();
+								if (Math::Abs(n.x) >= Math::Abs(n.y)) { n = Vector2(n.x / Math::Abs(n.x), 0.0f); }
+								else { n = Vector2(0.0f, n.y / Math::Abs(n.y)); }
+								this->SetPosition(this->GetPosition() + n);
+							}
 						}
 					}
 				}
-				//ゴール判定
-				if (tiles[i][j]->GetTileState() == Tile::EGoal)
-				{
-					if (Intersect(*mCircle, *(tiles[i][j]->GetCircle())))
-					{
-						GetGame()->GetMaze()->SetGoal();
-						break;
-					}
-				}
+			}
 
+			//ゴール判定
+			if (Intersect(*cc, *(GetGame()->treasure->cc))) {
+				GetGame()->maze->gameClear = true;
 			}
 		}
-
+	
 		// 左手法を実装。
 		// 前が壁だったとき、右方向にVelocityを変更。
 		// 左手が空いていたら左方向にVelocityを変更し、再び左手が壁になるまで前進。
@@ -132,7 +124,7 @@ void Shadow::UpdateActor(float deltaTime)
 			{
 				case 0:	//右向き
 					//左が空いているとき
-					if (tiles[std::round(index.x)][std::round(index.y) - 1]->GetTileState() != Tile::EWall)
+					if (GetGame()->tiles[std::round(index.x)][std::round(index.y) - 1]->mTileState != Tile::EWall)
 					{
 						if (turnLeftOk) {
 							ndir = (ndir + 1) % 4;	//向かって左を向く 
@@ -143,7 +135,7 @@ void Shadow::UpdateActor(float deltaTime)
 					else {
 						turnLeftOk = true;	//左が壁だったら次曲がって良し
 						// 前方が壁のとき
-						if (tiles[std::round(index.x) + 1][std::round(index.y)]->GetTileState() == Tile::EWall)
+						if (GetGame()->tiles[std::round(index.x) + 1][std::round(index.y)]->mTileState == Tile::EWall)
 						{
 							ndir = (ndir + 3) % 4;	//向かって右を向く 
 						}
@@ -152,7 +144,7 @@ void Shadow::UpdateActor(float deltaTime)
 
 				case 1:	//上向き
 					//左が空いているとき
-					if (tiles[std::round(index.x) - 1][std::round(index.y)]->GetTileState() != Tile::EWall)
+					if (GetGame()->tiles[std::round(index.x) - 1][std::round(index.y)]->mTileState != Tile::EWall)
 					{
 						if (turnLeftOk) {
 							ndir = (ndir + 1) % 4;	//向かって左を向く 
@@ -163,7 +155,7 @@ void Shadow::UpdateActor(float deltaTime)
 					else {
 						turnLeftOk = true;	//左が壁だったら次曲がって良し
 						// 前方が壁のとき
-						if (tiles[std::round(index.x)][std::round(index.y) - 1]->GetTileState() == Tile::EWall)
+						if (GetGame()->tiles[std::round(index.x)][std::round(index.y) - 1]->mTileState == Tile::EWall)
 						{
 							ndir = (ndir + 3) % 4;	//向かって右を向く 
 						}
@@ -172,7 +164,7 @@ void Shadow::UpdateActor(float deltaTime)
 
 				case 2:	//左向き
 					//左が空いているとき
-					if (tiles[std::round(index.x)][std::round(index.y) + 1]->GetTileState() != Tile::EWall)
+					if (GetGame()->tiles[std::round(index.x)][std::round(index.y) + 1]->mTileState != Tile::EWall)
 					{
 						if (turnLeftOk) {
 							ndir = (ndir + 1) % 4;	//向かって左を向く 
@@ -183,7 +175,7 @@ void Shadow::UpdateActor(float deltaTime)
 					else {
 						turnLeftOk = true;	//左が壁だったら次曲がって良し
 						// 前方が壁のとき
-						if (tiles[std::round(index.x) - 1][std::round(index.y)]->GetTileState() == Tile::EWall)
+						if (GetGame()->tiles[std::round(index.x) - 1][std::round(index.y)]->mTileState == Tile::EWall)
 						{
 							ndir = (ndir + 3) % 4;	//向かって右を向く 
 						}
@@ -191,7 +183,7 @@ void Shadow::UpdateActor(float deltaTime)
 					break;
 				case 3:	//下向き
 					//左が空いているとき
-					if (tiles[std::round(index.x) + 1][std::round(index.y)]->GetTileState() != Tile::EWall)
+					if (GetGame()->tiles[std::round(index.x) + 1][std::round(index.y)]->mTileState != Tile::EWall)
 					{
 						if (turnLeftOk) {
 							ndir = (ndir + 1) % 4;	//向かって左を向く 
@@ -202,7 +194,7 @@ void Shadow::UpdateActor(float deltaTime)
 					else {
 						turnLeftOk = true;	//左が壁だったら次曲がって良し
 						// 前方が壁のとき
-						if (tiles[std::round(index.x)][std::round(index.y) + 1]->GetTileState() == Tile::EWall)
+						if (GetGame()->tiles[std::round(index.x)][std::round(index.y) + 1]->mTileState == Tile::EWall)
 						{
 							ndir = (ndir - 1) % 4;	//向かって右を向く 
 						}
@@ -210,7 +202,7 @@ void Shadow::UpdateActor(float deltaTime)
 					break;
 			}
 		}
-		*/
+		
 
 		//ゴール判定
 		if (Intersect(*cc, *(GetGame()->maze->GetEndTile()->cc))) {
