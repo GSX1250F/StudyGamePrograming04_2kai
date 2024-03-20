@@ -11,48 +11,39 @@ public:
 	void UpdateActor(float deltaTime) override;
 
 
-	int GetWidth() { return mWidth; }
-	int GetHeight() { return mHeight; }
-	void SetWidth(int width) { mWidth = width; }
-	void SetHeigth(int height) { mHeight = height; }
-	std::vector<std::vector<int>> GetMap() { return map; }
-	std::vector<std::vector<class Tile*>> GetTiles() { return mTiles; }
+	int GetMapWidth() { return mapWidth; }
+	int GetMapHeight() { return mapHeight; }
+	void SetWidth(int width) { mapWidth = width; }
+	void SetHeigth(int height) { mapHeight = height; }
+	std::vector<std::vector<int>> GetMapIndex() { return mapIndex; }
+	void SetMapIndex(int i, int j, int data) { mapIndex[i][j] = data; }
+
 	void GenerateMap();
-	void SetGoal() { goal = true; };
 	bool startOk = false;
+	void SetMazeClear(bool data) { mazeClear = data; };
 
-	class Tile* GetStartTile();
-	class Tile* GetEndTile();
 	
-	// Use A* to find a path
-	bool FindPath(class Tile* start, class Tile* goal);
-
+	
 private:
-	std::vector<std::vector<int>> map;
-	std::vector<std::vector<class Tile*>> mTiles;
-	class Brave* brave;
-	//class MazeGenerator* mz;
-	class MazeClr* mazeclr;
-	class Shadow* shadow;
-	int mWidth;
-	int mHeight;
-	float TileSize;
-	float mBraveSize;
+	std::vector<std::vector<int>> mapIndex;
+	int mapWidth;
+	int mapHeight;
+	
 	//スタート位置インデックス
 	int sxindex;
 	int syindex;
 	//ゴール位置インデックス
 	int gxindex;	
 	int gyindex;
-	bool goal = false;
+	
+	// 迷路クリア
+	bool mazeClear = false;
+
+	// 経路探索用
 	void MakeGraphNodes();
-
-
-	// Update textures for tiles on path
+	bool FindPath(class Tile* start, class Tile* goal);
 	void UpdatePathTiles(class Tile* start);
-
-	// ノードから親へのマップ
-	std::unordered_map <Tile*, Tile* > outMap;
+	std::unordered_map <Tile*, Tile* > outMap;	// ノードから親へのマップ
 
 };
 

@@ -33,7 +33,8 @@ public:
 	class Shadow* GetShadow() { return shadow; }
 	class MazeClr* GetMazeClr() { return mazeClr; }
 	std::vector<std::vector<Tile*>> GetTiles() { return tiles; }
-
+	void InitMaze();
+	
 private:
 	void ProcessInput();
 	void UpdateGame();
@@ -67,4 +68,5 @@ private:
 	class MazeClr* mazeClr;
 	class Tile* tile;
 	std::vector<std::vector<Tile*>> tiles;
+	
 };

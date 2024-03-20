@@ -11,87 +11,42 @@
 #include <algorithm>
 #include <vector>
 
-Maze::Maze(Game* game) : Actor(game),mWidth(7),mHeight(7),gxindex(0),gyindex(0)
+Maze::Maze(Game* game) : Actor(game)
 {
+	mapWidth = 7;
+	mapHeight = 7;
 	//横幅、縦幅をともに7以上の奇数にする。
-	while (mWidth < 7 || mWidth % 2 == 0) {	mWidth++;}
-	while (mHeight < 7 || mHeight % 2 == 0) { mHeight++; }
-
-	//アクターをインスタンス
-	brave = new Brave(GetGame());
-	mazeclr = new MazeClr(GetGame());
-	
-	//AI操作のキャラをインスタンス
-	shadow = new Shadow(GetGame());
-	
-	//Tileをインスタンス
-	mTiles.resize(mWidth);
-	for (int i = 0; i < mWidth; i++)
-	{
-		mTiles[i].resize(mHeight);
-
-		for (int j = 0; j < mHeight; j++)
-		{
-			mTiles[i][j] = new Tile(GetGame());
-		}
-	}
-	TileSize = mTiles[0][0]->GetTexSize();
-	
-	
-	//マップ情報を作成
-	GenerateMap();
-
-
-	
-
+	while (mapWidth < 7 || mapWidth % 2 == 0) {	mapWidth++;}
+	while (mapHeight < 7 || mapHeight % 2 == 0) { mapHeight++; }
 }
 
 void Maze::ActorInput(const uint8_t* keyState)
 {
-	if (keyState[SDL_SCANCODE_R]){	GenerateMap();	}
-}
-
-void Maze::UpdateActor(float deltaTime)
-{
-	if (goal)
-	{
-		mazeclr->SetState(EActive);
+	if (keyState[SDL_SCANCODE_R]){
+		//初期化
+		GetGame()->InitMaze();
+		GenerateMap();	
 	}
 }
+
+void Maze::UpdateActor(float deltaTime){ }
 
 void Maze::GenerateMap()
 {
-	//初期化
-	startOk = false;
-	goal = false;
-	brave->SetState(EPaused);
-	brave->SetPosition(Vector2(0.0f, 1000.0f));
-	shadow->SetState(EPaused);
-	shadow->SetPosition(Vector2(0.0f, 1000.0f));
-	shadow->SetDir(1);
-	mazeclr->SetState(EPaused);
-	mazeclr->SetPosition(Vector2(1024.0f / 2.0f, 768.0f / 2.0f));
-	for (int i = 0; i < mWidth; i++) {
-		for (int j = 0; j < mHeight; j++) {
-			mTiles[i][j]->SetState(EPaused);
-			mTiles[i][j]->SetPosition(Vector2(0.0f, 1000.0f));
-			mTiles[i][j]->GetCircle()->SetRadius(mTiles[i][j]->GetTexSize() / 2.0f);
-		}
-	}
-
 	//迷路作成
-	while (true)
+	bool mazeNG = true;
+	while (mazeNG)
 	{
-		map = MazeCreate(mWidth, mHeight);
-		//map = mz->GetMaze();
-		for (int i = 0; i < mWidth; i++) {
-			for (int j = 0; j < mHeight; j++) {
-				if (map[i][j] == 2) {
+		mapIndex = MazeCreate(mapWidth, mapHeight);
+		
+		for (int i = 0; i < mapWidth; i++) {
+			for (int j = 0; j < mapHeight; j++) {
+				if (mapIndex[i][j] == 2) {
 					//スタート位置インデックス
 					sxindex = i;
 					syindex = j;
 				}
-				if (map[i][j] == 3) {
+				if (mapIndex[i][j] == 3) {
 					//ゴール位置インデックス
 					gxindex = i;
 					gyindex = j;
@@ -99,10 +54,14 @@ void Maze::GenerateMap()
 			}
 		}
 		//簡単すぎないかチェック
-		if ((gxindex > static_cast<int>(mWidth / 2)) && (gyindex > static_cast<int>(mHeight / 2))) { break; }
+		if ((gxindex > static_cast<int>(mapWidth / 2)) && (gyindex > static_cast<int>(mapHeight / 2))) { mazeNG = false; }
 	}
 
 	//Tileと主人公のindexとpositionをセット.Active化
+	GetTexSize() * Vector2((i + 1) * 1.0f, (j + 1) * 1.0f));)
+		brave->SetPosition
+	shadow->SetState(EActive);
+	shadow->SetPosition(mTiles[i][j]->GetTexSize() * Vector2((i + 1) * 1.0f, (j + 1) * 1.0f));
 	for (int i = 0; i < mWidth; i++) {
 		for (int j = 0; j < mHeight; j++) {
 			switch (map[i][j]) {
@@ -118,9 +77,7 @@ void Maze::GenerateMap()
 					//スタート
 					mTiles[i][j]->SetTileState(Tile::EStart);
 					brave->SetState(EActive);
-					brave->SetPosition(mTiles[i][j]->GetTexSize() * Vector2((i + 1) * 1.0f, (j + 1) * 1.0f));
-					shadow->SetState(EActive);
-					shadow->SetPosition(mTiles[i][j]->GetTexSize() * Vector2((i + 1) * 1.0f, (j + 1) * 1.0f));
+					
 					break;
 				case 3:
 					//ゴール
@@ -152,16 +109,6 @@ void Maze::GenerateMap()
 
 	auto st = GetStartTile();
 	shadow->SetPath();
-}
-
-Tile* Maze::GetStartTile()
-{
-	return mTiles[sxindex][syindex];
-}
-
-Tile* Maze::GetEndTile()
-{
-	return mTiles[gxindex][gyindex];
 }
 
 void Maze::MakeGraphNodes()

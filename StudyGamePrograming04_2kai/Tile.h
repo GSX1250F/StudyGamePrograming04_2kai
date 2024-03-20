@@ -4,7 +4,7 @@
 class Tile : public Actor
 {
 public:
-	friend class Maze;
+	//friend class Maze;	//friend classってなんじゃ～
 	enum TileState
 	{
 		EDefault,
@@ -17,25 +17,19 @@ public:
 	Tile(class Game* game);
 	void SetTileState(TileState state);
 	TileState GetTileState() const { return mTileState; }
-	float GetTexSize() { return mTexSize; }
-
-	class CircleComponent* GetCircle() { return mCircle; }
+	
+	class CircleComponent* GetCircle() { return cc; }
 
 	const Tile* GetParent() const { return mParent; }
+	
 
 private:
 	void UpdateTexture();
-	class SpriteComponent* mSprite;
+	class SpriteComponent* sc;
 	TileState mTileState;
-	float mTexSize;
-	class CircleComponent* mCircle;
+	class CircleComponent* cc;
 	std::vector<Tile*> mAdjacent;	//隣接ノード配列
-	Tile* mParent;
-	float f;
-	float g;
-	float h;
-	bool mInOpenSet;
-	bool mInClosedSet;
-	bool mBlocked;
+	Tile* mParent;	//親ノード
+	
 };
 

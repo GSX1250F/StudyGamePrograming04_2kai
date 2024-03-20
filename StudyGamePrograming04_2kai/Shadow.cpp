@@ -13,7 +13,6 @@
 
 Shadow::Shadow(Game* game) : Actor(game)
 {
-	SetPosition(Vector2(-100.0f, -100.0f));	//初期位置は画面外
 	// アニメーションのスプライトコンポーネントを作成
 	asc = new AnimSpriteComponent(this, 40);
 	std::vector<SDL_Texture*> anims = {
@@ -212,11 +211,15 @@ void Shadow::UpdateActor(float deltaTime)
 			}
 		}
 		*/
+
+		//ゴール判定
+		if (Intersect(*cc, *(GetGame()->GetMaze()->GetEndTile()->GetCircle()))) {
+			GetGame()->GetMaze()->SetMazeClear(true);
+		}
 	}
 	
 
-
-
+	
 }
 
 Vector2 Shadow::GetIndex()
@@ -237,6 +240,6 @@ Vector2 Shadow::GetIndex2()
 
 void Shadow::SetPath()
 {
-	Tile* st = GetGame()->GetTiles()->GetStartTile();
+	Tile* st = GetGame()->GetMaze()->GetStartTile();
 	nc->StartPath(st);
 }

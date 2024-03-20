@@ -5,23 +5,17 @@
 
 Tile::Tile(class Game* game)
 	:Actor(game)
-	, mSprite(nullptr)
 	, mTileState(EDefault)
 	, mParent(nullptr)
-	, f(0.0f)
-	, g(0.0f)
-	, h(0.0f)
 {
-	mSprite = new SpriteComponent(this , 10);
-	SetScale(0.8f);
-	SetState(EPaused);
+	//スプライトコンポーネント作成
+	sc = new SpriteComponent(this , 10);
 	SetTileState(EDefault);
 	UpdateTexture();
-	mTexSize = mSprite->GetTexWidth() * GetScale();
 	
 	//CircleComponent作成
-	mCircle = new CircleComponent(this);
-	mCircle->SetRadius(mTexSize / 2.0f);
+	cc = new CircleComponent(this);
+	cc->SetRadius(sc->GetTexWidth() / 2.0f);
 	
 }
 
@@ -53,5 +47,5 @@ void Tile::UpdateTexture()
 		text = "Assets/Treasure.png";
 		break;
 	}
-	mSprite->SetTexture(GetGame()->GetTexture(text));
+	sc->SetTexture(GetGame()->GetTexture(text));
 }

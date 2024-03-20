@@ -9,7 +9,6 @@
 
 
 Brave::Brave(Game* game) : Actor(game){
-	SetPosition(Vector2( - 100.0f, -100.0f));	//初期位置は画面外
 	// アニメーションのスプライトコンポーネントを作成
 	asc = new AnimSpriteComponent(this, 40);
 	std::vector<SDL_Texture*> anims = {
@@ -84,14 +83,13 @@ void Brave::UpdateActor(float deltaTime){
 						}
 					}
 				}
-				//ゴール判定
-				if (tiles[i][j]->GetTileState() == Tile::EGoal){
-					if (Intersect(*cc, *(tiles[i][j]->GetCircle()))){
-						GetGame()->GetMazeClr()->SetPosition(Vector2(GetGame()->mWindowWidth / 2.0f , GetGame()->mWindowHeight / 2.0f));
-						break;
-					}
-				}
 			}
 		}
+
+		//ゴール判定
+		if (Intersect(*cc, *(GetGame()->GetMaze()->GetEndTile()->GetCircle()))) {
+			GetGame()->GetMaze()->SetMazeClear(true);
+		}
 	}
+	
 }
