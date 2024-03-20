@@ -23,8 +23,8 @@ public:
 	void SetRunning(bool isrunning) { mIsRunning = isrunning; }
 
 	//âÊñ ÉTÉCÉY
-	const int mWindowWidth = 1280;
-	const int mWindowHeight = 1080;
+	const int mWindowWidth = 1600;
+	const int mWindowHeight = 900;
 
 	
 	//Game-specific	
@@ -34,7 +34,8 @@ public:
 	class MazeClr* mazeClr;
 	class Tile* tile;
 	std::vector<std::vector<Tile*>> tiles;
-	
+	class Treasure* treasure;
+
 private:
 	void ProcessInput();
 	void UpdateGame();

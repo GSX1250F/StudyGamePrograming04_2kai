@@ -15,7 +15,9 @@ public:
 	};
 
 	Tile(class Game* game);
-	class SpriteComponent* sc;
+	void UpdateActor(float deltaTime) override;
+
+	class AnimSpriteComponent* asc;
 	class CircleComponent* cc;
 
 	TileState mTileState;

@@ -14,6 +14,7 @@ public:
 	Vector2 GetIndex();
 	Vector2 GetIndex2();
 	void SetDir(int n) { ndir = n; }
+	class Tile* tile;
 	void SetPath();
 
 	int ndir;	//is•ûŒü@ndir ==0:RIGHT,1:UP,2:LEFT,3:DOWN

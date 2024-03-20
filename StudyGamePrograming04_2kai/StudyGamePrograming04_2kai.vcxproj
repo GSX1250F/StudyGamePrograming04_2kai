@@ -36,6 +36,7 @@
     <ClCompile Include="Shadow.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
     <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="Treasure.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
@@ -54,6 +55,7 @@
     <ClInclude Include="Shadow.h" />
     <ClInclude Include="SpriteComponent.h" />
     <ClInclude Include="Tile.h" />
+    <ClInclude Include="Treasure.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

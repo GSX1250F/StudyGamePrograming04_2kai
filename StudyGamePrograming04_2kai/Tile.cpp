@@ -1,5 +1,5 @@
 #include "Tile.h"
-#include "SpriteComponent.h"
+#include "AnimSpriteComponent.h"
 #include "Game.h"
 #include "CircleComponent.h"
 
@@ -8,16 +8,25 @@ Tile::Tile(class Game* game)
 	, mTileState(EDefault)
 	, mParent(nullptr)
 {
-	//スプライトコンポーネント作成
-	sc = new SpriteComponent(this , 10);
-	mTexSize = sc->GetTexWidth();
-	SetTileState(EDefault);
-	UpdateTexture();
+	// アニメーションのスプライトコンポーネントを作成
+	asc = new AnimSpriteComponent(this, 10);
+	std::vector<SDL_Texture*> anims = {
+		game->GetTexture("Assets/Default.png"),
+		game->GetTexture("Assets/Wall.png"),
+		game->GetTexture("Assets/Path.png")
+	};
+	asc->SetAnimTextures(anims, 1, 3, false);
+	mTexSize = asc->GetTexWidth();
 	
 	//CircleComponent作成
 	cc = new CircleComponent(this);
-	cc->SetRadius(sc->GetTexWidth() / 2.0f);
+	cc->SetRadius(asc->GetTexWidth() / 2.0f);
 	
+}
+
+void Tile::UpdateActor(float deltaTime)
+{
+	UpdateTexture();
 }
 
 void Tile::SetTileState(TileState state)
@@ -28,25 +37,15 @@ void Tile::SetTileState(TileState state)
 
 void Tile::UpdateTexture()
 {
-	std::string text;
 	switch (mTileState)
 	{
-	case EDefault:
-		text = "Assets/Default.png";
-		break;
-
-	case EPath:
-		text = "Assets/Path.png";
-		break;
-	case EWall:
-		text = "Assets/Wall.png";
-		break;
-	case EStart:
-		text = "Assets/Default.png";
-		break;
-	case EGoal:
-		text = "Assets/Treasure.png";
-		break;
+		case EPath:
+			asc->SetAnimNum(3, 3, false);
+			break;
+		case EWall:
+			asc->SetAnimNum(2, 2, false);
+			break;
+		default:
+			asc->SetAnimNum(1, 1, false);
 	}
-	sc->SetTexture(GetGame()->GetTexture(text));
 }

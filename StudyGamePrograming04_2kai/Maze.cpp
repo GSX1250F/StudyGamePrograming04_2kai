@@ -4,6 +4,7 @@
 #include "Brave.h"
 #include "MazeClr.h"
 #include "Shadow.h"
+#include "Treasure.h"
 #include "Tile.h"
 #include "CircleComponent.h"
 #include <queue>
@@ -13,8 +14,8 @@
 
 Maze::Maze(Game* game) : Actor(game)
 {
-	mapWidth = 7;
-	mapHeight = 7;
+	mapWidth = 51;
+	mapHeight = 29;
 	//横幅、縦幅をともに7以上の奇数にする。
 	while (mapWidth < 7 || mapWidth % 2 == 0) {	mapWidth++;}
 	while (mapHeight < 7 || mapHeight % 2 == 0) { mapHeight++; }
@@ -24,28 +25,49 @@ void Maze::ActorInput(const uint8_t* keyState)
 {
 	if (keyState[SDL_SCANCODE_R]){
 		// 迷路再構成
-		InitMaze(false);
-		GenerateMap();	
-		InitMaze(true);
+		ResetMaze();
 	}
 }
 
-void Maze::UpdateActor(float deltaTime){ }
+void Maze::UpdateActor(float deltaTime){
+	if (gameClear == true) {
+		GetGame()->mazeClr->SetPosition(Vector2(GetGame()->mWindowWidth / 2.0f, GetGame()->mWindowHeight / 2.0f));
+	}
+}
+
+void Maze::ResetMaze()
+{
+	// 迷路作成
+	InitMaze(false);
+	GenerateMap();
+	InitMaze(true);
+	//隣接ノード作成
+	MakeGraphNodes(GetGame()->tiles);
+
+	// Find path (in reverse)
+	FindPath(GetEndTile(), GetStartTile());
+	UpdatePathTiles(GetStartTile());
+
+	GetGame()->shadow->SetPath();
+}
 
 void Maze::InitMaze(bool gamestart)
 {
-	GetGame()->mazeClr->SetPosition(Vector2(GetGame()->mWindowWidth / 2.0f, 2 * GetGame()->mWindowHeight));	//初期位置は画面外
-	gameClear = false;
-	if (gamestart = false) {
+	if (gamestart == false) {
 		// 迷路作成中
+		GetGame()->mazeClr->SetPosition(Vector2(GetGame()->mWindowWidth / 2.0f, 2 * GetGame()->mWindowHeight));	//初期位置は画面外
+		gameClear = false;
 		// 各アクターを迷路作成中は画面外におく。
 		GetGame()->brave->SetPosition(Vector2(-100.0f, -100.0f));	//初期位置は画面外
 		GetGame()->shadow->SetPosition(Vector2(-100.0f, -100.0f));	//初期位置は画面外
+		GetGame()->treasure->SetPosition(Vector2(-100.0f, -100.0f));	//初期位置は画面外
 		GetGame()->shadow->SetDir(1);
 		for (int i = 0; i < mapWidth; i++) {
 			for (int j = 0; j < mapHeight; j++) {
 				GetGame()->tiles[i][j]->SetTileState(Tile::EDefault);
 				GetGame()->tiles[i][j]->SetPosition(Vector2(-100.0f, -100.0f));
+				GetGame()->tiles[i][j]->mAdjacent.clear();
+				GetGame()->tiles[i][j]->mParent = nullptr;
 				mapIndex[i][j] = 0;
 			}
 		}
@@ -55,6 +77,7 @@ void Maze::InitMaze(bool gamestart)
 		// 各アクターの初期位置を設定
 		GetGame()->brave->SetPosition(GetTilePos(sindex));
 		GetGame()->shadow->SetPosition(GetTilePos(sindex));
+		GetGame()->treasure->SetPosition(GetTilePos(gindex));
 		for (int i = 0; i < mapWidth; i++) {
 			for (int j = 0; j < mapHeight; j++) {
 				int index[2] = {i , j};
@@ -81,15 +104,15 @@ void Maze::GenerateMap()
 		
 		for (int i = 0; i < mapWidth; i++) {
 			for (int j = 0; j < mapHeight; j++) {
-				if (mapIndex[i][j] == 2) {
-					//スタート位置インデックス
-					sindex[0] = i;
-					sindex[1] = j;
-				}
-				if (mapIndex[i][j] == 3) {
-					//ゴール位置インデックス
-					gindex[0] = i;
-					gindex[1] = j;
+				switch (mapIndex[i][j]) {
+					case 2:		//スタート
+						sindex[0] = i;
+						sindex[1] = j;
+						break;
+					case 3:		//ゴール
+						gindex[0] = i;
+						gindex[1] = j;
+						break;
 				}
 			}
 		}
@@ -97,15 +120,6 @@ void Maze::GenerateMap()
 		if ((gindex[0] > static_cast<int>(mapWidth / 2)) && (gindex[1] > static_cast<int>(mapHeight / 2))) { mazeNG = false; }
 	}
 	gameStart = true;
-
-	//隣接ノード作成
-	MakeGraphNodes();
-
-	// Find path (in reverse)
-	FindPath(GetEndTile(), GetStartTile());
-	UpdatePathTiles(GetStartTile());
-
-	GetGame()->shadow->SetPath();
 }
 
 Vector2 Maze::GetTilePos(int index[2])
@@ -127,30 +141,28 @@ Tile* Maze::GetEndTile()
 	return tile;
 }
 
-void Maze::MakeGraphNodes()
+void Maze::MakeGraphNodes(std::vector<std::vector<Tile*>> &tiles)
 {
-	auto mTiles = GetGame()->tiles;
-	for (int i = 0; i < mTiles.size(); i++) {
-		for (int j = 0; j < mTiles[i].size(); j++) {
-			if (mTiles[i][j]->mTileState != Tile::EWall) {
-				if (mTiles[i - 1][j]->mTileState != Tile::EWall) {
-					mTiles[i][j]->mAdjacent.push_back(mTiles[i - 1][j]);
+	for (int i = 0; i < tiles.size(); i++) {
+		for (int j = 0; j < tiles[i].size(); j++) {
+			if (tiles[i][j]->mTileState != Tile::EWall) {
+				if (tiles[i - 1][j]->mTileState != Tile::EWall) {
+					tiles[i][j]->mAdjacent.push_back(tiles[i - 1][j]);
 				}
-				if (mTiles[i + 1][j]->mTileState != Tile::EWall) {
-					mTiles[i][j]->mAdjacent.push_back(mTiles[i + 1][j]);
+				if (tiles[i + 1][j]->mTileState != Tile::EWall) {
+					tiles[i][j]->mAdjacent.push_back(tiles[i + 1][j]);
 				}
-				if (mTiles[i][j - 1]->mTileState != Tile::EWall){
-					mTiles[i][j]->mAdjacent.push_back(mTiles[i][j - 1]);
+				if (tiles[i][j - 1]->mTileState != Tile::EWall) {
+					tiles[i][j]->mAdjacent.push_back(tiles[i][j - 1]);
 				}
-				if (mTiles[i][j + 1]->mTileState != Tile::EWall) {
-					mTiles[i][j]->mAdjacent.push_back(mTiles[i][j + 1]);
+				if (tiles[i][j + 1]->mTileState != Tile::EWall) {
+					tiles[i][j]->mAdjacent.push_back(tiles[i][j + 1]);
 				}
 
 			}
 		}
 	}
 }
-
 
 bool Maze::FindPath(Tile* start, Tile* goal)
 {
@@ -238,7 +250,7 @@ bool Maze::FindPath(Tile* start, Tile* goal)
 	// Implements BFS pathfinding
 
 	// ノードから親へのマップ
-	//std::unordered_map <const Tile*, const Tile* > outMap;
+	std::unordered_map <Tile*, Tile* > outMap;
 	//経路を見つけたか？
 	bool pathFound = false;
 	// 検討するノード

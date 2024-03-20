@@ -233,13 +233,13 @@ Vector2 Shadow::GetIndex()
 Vector2 Shadow::GetIndex2()
 {
 	//index‚Ìfloat’l
-	float xindex = GetPosition().x / GetGame()->tiles[0][0]->sc->GetTexWidth() - 1.0f;
-	float yindex = GetPosition().y / GetGame()->tiles[0][0]->sc->GetTexWidth() - 1.0f;
+	float xindex = GetPosition().x / GetGame()->tiles[0][0]->asc->GetTexWidth() - 1.0f;
+	float yindex = GetPosition().y / GetGame()->tiles[0][0]->asc->GetTexWidth() - 1.0f;
 	return Vector2(xindex, yindex);	
 }
 
 void Shadow::SetPath()
 {
-	Tile* st = GetGame()->maze->GetStartTile();
-	nc->StartPath(st);
+	nc->StartPath(GetGame()->maze->GetStartTile());
 }
+

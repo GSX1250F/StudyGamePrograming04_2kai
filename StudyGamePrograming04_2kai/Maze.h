@@ -18,6 +18,9 @@ public:
 	std::vector<std::vector<int>> GetMapIndex() { return mapIndex; }
 	void SetMapIndex(int i, int j, int data) { mapIndex[i][j] = data; }
 
+	// 迷路のリセット
+	void ResetMaze();
+
 	// 迷路の各アクターの位置をリセット
 	void InitMaze(bool gamestart);
 	// マップを（再）構成
@@ -43,10 +46,10 @@ public:
 	float mTileSize;
 	
 	// 経路探索用
-	void MakeGraphNodes();
+	void MakeGraphNodes(std::vector<std::vector<Tile*>> &tiles);
 	bool FindPath(class Tile* start, class Tile* goal);
 	void UpdatePathTiles(class Tile* start);
-	std::unordered_map <Tile*, Tile* > outMap;	// ノードから親へのマップ
+	
 
 };
 

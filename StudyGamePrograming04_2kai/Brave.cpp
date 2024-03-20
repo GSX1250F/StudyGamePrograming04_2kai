@@ -1,6 +1,7 @@
 #include "Brave.h"
 #include "Game.h"
 #include "Tile.h"
+#include "Treasure.h"
 #include "Maze.h"
 #include "MazeClr.h"
 #include "AnimSpriteComponent.h"
@@ -87,7 +88,7 @@ void Brave::UpdateActor(float deltaTime){
 		}
 
 		//ƒS[ƒ‹”»’è
-		if (Intersect(*cc, *(GetGame()->maze->GetEndTile()->cc))) {
+		if (Intersect(*cc, *(GetGame()->treasure->cc))) {
 			GetGame()->maze->gameClear = true;
 		}
 	}

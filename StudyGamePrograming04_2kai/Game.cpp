@@ -8,6 +8,7 @@
 #include "Shadow.h"
 #include "MazeClr.h"
 #include "Tile.h"
+#include "Treasure.h"
 
 Game::Game()
 	:mWindow(nullptr)
@@ -27,7 +28,7 @@ bool Game::Initialize()
 		return false;
 	}
 	// SDLウィンドウを作成
-	mWindow = SDL_CreateWindow("Game Programming in C++ (Chapter 2)", 100, 100, mWindowWidth, mWindowHeight, 0);
+	mWindow = SDL_CreateWindow("Game Programming in C++ (Chapter 2)", 50, 50, mWindowWidth, mWindowHeight, 0);
 	if (!mWindow)
 	{
 		SDL_Log("ウィンドウの作成に失敗しました: %s", SDL_GetError());
@@ -161,13 +162,16 @@ void Game::LoadData()
 	//迷路を作成
 	brave = new Brave(this);
 	shadow = new Shadow(this);
+	treasure = new Treasure(this);
 	mazeClr = new MazeClr(this);
 	maze = new Maze(this);
-	//Tileをインスタンス
+	//Tileをインスタンス, mapIndexを用意
 	tiles.resize(maze->mapWidth);
+	maze->mapIndex.resize(maze->mapWidth);
 	for (int i = 0; i < tiles.size(); i++)
 	{
 		tiles[i].resize(maze->mapHeight);
+		maze->mapIndex[i].resize(maze->mapHeight);
 
 		for (int j = 0; j < tiles[i].size(); j++)
 		{
@@ -176,11 +180,8 @@ void Game::LoadData()
 	}
 	maze->mTileSize = tiles[0][0]->mTexSize;
 	
-	
-	// 迷路作成
-	maze->InitMaze(false);
-	maze->GenerateMap();
-	maze->InitMaze(true);
+	//迷路リセット
+	maze->ResetMaze();
 }
 
 void Game::UnloadData()
