@@ -18,27 +18,30 @@ public:
 	std::vector<std::vector<int>> GetMapIndex() { return mapIndex; }
 	void SetMapIndex(int i, int j, int data) { mapIndex[i][j] = data; }
 
+	// 迷路の各アクターの位置をリセット
+	void InitMaze(bool gamestart);
+	// マップを（再）構成
 	void GenerateMap();
-	bool startOk = false;
-	void SetMazeClear(bool data) { mazeClear = data; };
+	// ゲームクリア
+	bool gameClear = false;
+	// ゲームスタート
+	bool gameStart = false;
+	Vector2 GetTilePos(int index[2]);
+	
+	class Tile* GetStartTile();
+	class Tile* GetEndTile();
 
-	
-	
-private:
 	std::vector<std::vector<int>> mapIndex;
 	int mapWidth;
 	int mapHeight;
 	
 	//スタート位置インデックス
-	int sxindex;
-	int syindex;
+	int sindex[2];
 	//ゴール位置インデックス
-	int gxindex;	
-	int gyindex;
+	int gindex[2];	
+	// タイルサイズ
+	float mTileSize;
 	
-	// 迷路クリア
-	bool mazeClear = false;
-
 	// 経路探索用
 	void MakeGraphNodes();
 	bool FindPath(class Tile* start, class Tile* goal);

@@ -163,21 +163,24 @@ void Game::LoadData()
 	shadow = new Shadow(this);
 	mazeClr = new MazeClr(this);
 	maze = new Maze(this);
-	
 	//Tileをインスタンス
-	tiles.resize(GetMaze()->GetMapWidth());
+	tiles.resize(maze->mapWidth);
 	for (int i = 0; i < tiles.size(); i++)
 	{
-		tiles[i].resize(GetMaze()->GetMapHeight());
+		tiles[i].resize(maze->mapHeight);
 
 		for (int j = 0; j < tiles[i].size(); j++)
 		{
 			tiles[i][j] = new Tile(this);
 		}
 	}
-
-	InitMaze();
+	maze->mTileSize = tiles[0][0]->mTexSize;
+	
+	
+	// 迷路作成
+	maze->InitMaze(false);
 	maze->GenerateMap();
+	maze->InitMaze(true);
 }
 
 void Game::UnloadData()
@@ -300,21 +303,4 @@ void Game::RemoveSprite(SpriteComponent* sprite)
 	// (We can't swap because it ruins ordering)
 	auto iter = std::find(mSprites.begin(), mSprites.end(), sprite);
 	mSprites.erase(iter);
-}
-
-// GameSpecific
-void Game::InitMaze(){
-	brave->SetPosition(Vector2(-100.0f, -100.0f));	//初期位置は画面外
-	shadow->SetPosition(Vector2(-100.0f, -100.0f));	//初期位置は画面外
-	shadow->SetDir(1);
-	mazeClr->SetPosition(Vector2(mWindowWidth / 2.0f, 2 * mWindowHeight));	//初期位置は画面外
-	maze->SetMazeClear(false);
-	maze->startOk = false;
-	for (int i = 0; i < tiles.size(); i++){
-		for (int j = 0; j < tiles[i].size(); j++){
-			tiles[i][j]->SetTileState(Tile::EDefault);
-			tiles[i][j]->SetPosition(Vector2(-100.0f,-100.0f));
-			maze->SetMapIndex(i, j, 0);
-		}
-	}
 }

@@ -36,11 +36,11 @@ Brave::Brave(Game* game) : Actor(game){
 	cc->SetRadius(asc->GetTexWidth() / 2.0f);
 
 	//MoveComponent作成
-	MoveComponent* mc = new MoveComponent(this);
+	mc = new MoveComponent(this);
 }
 
 void Brave::ActorInput(const uint8_t* keyState){
-	if (GetGame()->GetMaze()->startOk == true) {
+	if (GetGame()->maze->gameStart == true) {
 		//入力に応じて、アニメーションの設定と移動
 		SetVelocity(Vector2::Zero);		//速度リセット
 		int bg = asc->GetAnimNumBeg();
@@ -66,15 +66,15 @@ void Brave::ActorInput(const uint8_t* keyState){
 }
 
 void Brave::UpdateActor(float deltaTime){
-	if (GetGame()->GetMaze()->startOk == true) {
-		std::vector<std::vector<Tile*>> tiles = GetGame()->GetTiles();
+	if (GetGame()->maze->gameStart == true) {
+		std::vector<std::vector<Tile*>> tiles = GetGame()->tiles;
 		for (int i = 0; i < tiles.size(); i++){
 			for (int j = 0; j < tiles[i].size(); j++){
-				if (tiles[i][j]->GetTileState() == Tile::EWall){
+				if (tiles[i][j]->mTileState == Tile::EWall){
 					//壁衝突判定
-					if (Intersect(*cc, *(tiles[i][j]->GetCircle()))){
+					if (Intersect(*cc, *(tiles[i][j]->cc))){
 
-						while (Intersect(*cc, *(tiles[i][j]->GetCircle()))){
+						while (Intersect(*cc, *(tiles[i][j]->cc))){
 							//位置を調整。差ベクトルのx,y成分の大きいほうを1とした分だけ離す
 							Vector2 n = this->GetPosition() - tiles[i][j]->GetPosition();
 							if (Math::Abs(n.x) >= Math::Abs(n.y)) { n = Vector2(n.x / Math::Abs(n.x), 0.0f); }
@@ -87,8 +87,8 @@ void Brave::UpdateActor(float deltaTime){
 		}
 
 		//ゴール判定
-		if (Intersect(*cc, *(GetGame()->GetMaze()->GetEndTile()->GetCircle()))) {
-			GetGame()->GetMaze()->SetMazeClear(true);
+		if (Intersect(*cc, *(GetGame()->maze->GetEndTile()->cc))) {
+			GetGame()->maze->gameClear = true;
 		}
 	}
 	

@@ -54,7 +54,7 @@ Shadow::Shadow(Game* game) : Actor(game)
 
 void Shadow::ActorInput(const uint8_t* keyState)
 {
-	if (GetGame()->GetMaze()->startOk == true) {
+	if (GetGame()->maze->gameStart == true) {
 		//入力に応じて、アニメーションの設定と移動
 		SetVelocity(Vector2::Zero);
 		int bg = asc->GetAnimNumBeg();
@@ -84,7 +84,7 @@ void Shadow::ActorInput(const uint8_t* keyState)
 
 void Shadow::UpdateActor(float deltaTime)
 {
-	if (GetGame()->GetMaze()->startOk == true) {
+	if (GetGame()->maze->gameStart == true) {
 		
 		/*
 		auto tiles = GetGame()->GetMaze()->GetTiles();
@@ -213,8 +213,8 @@ void Shadow::UpdateActor(float deltaTime)
 		*/
 
 		//ゴール判定
-		if (Intersect(*cc, *(GetGame()->GetMaze()->GetEndTile()->GetCircle()))) {
-			GetGame()->GetMaze()->SetMazeClear(true);
+		if (Intersect(*cc, *(GetGame()->maze->GetEndTile()->cc))) {
+			GetGame()->maze->gameClear = true;
 		}
 	}
 	
@@ -233,13 +233,13 @@ Vector2 Shadow::GetIndex()
 Vector2 Shadow::GetIndex2()
 {
 	//indexのfloat値
-	float xindex = GetPosition().x / GetGame()->GetTiles()[0][0]->sc->GetTexWidth() - 1.0f;
-	float yindex = GetPosition().y / GetGame()->GetTiles()[0][0]->sc->GetTexWidth() - 1.0f;
+	float xindex = GetPosition().x / GetGame()->tiles[0][0]->sc->GetTexWidth() - 1.0f;
+	float yindex = GetPosition().y / GetGame()->tiles[0][0]->sc->GetTexWidth() - 1.0f;
 	return Vector2(xindex, yindex);	
 }
 
 void Shadow::SetPath()
 {
-	Tile* st = GetGame()->GetMaze()->GetStartTile();
+	Tile* st = GetGame()->maze->GetStartTile();
 	nc->StartPath(st);
 }

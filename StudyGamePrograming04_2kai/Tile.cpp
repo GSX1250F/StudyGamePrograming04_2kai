@@ -10,6 +10,7 @@ Tile::Tile(class Game* game)
 {
 	//スプライトコンポーネント作成
 	sc = new SpriteComponent(this , 10);
+	mTexSize = sc->GetTexWidth();
 	SetTileState(EDefault);
 	UpdateTexture();
 	

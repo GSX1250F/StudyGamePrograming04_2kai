@@ -23,13 +23,53 @@ Maze::Maze(Game* game) : Actor(game)
 void Maze::ActorInput(const uint8_t* keyState)
 {
 	if (keyState[SDL_SCANCODE_R]){
-		//初期化
-		GetGame()->InitMaze();
+		// 迷路再構成
+		InitMaze(false);
 		GenerateMap();	
+		InitMaze(true);
 	}
 }
 
 void Maze::UpdateActor(float deltaTime){ }
+
+void Maze::InitMaze(bool gamestart)
+{
+	GetGame()->mazeClr->SetPosition(Vector2(GetGame()->mWindowWidth / 2.0f, 2 * GetGame()->mWindowHeight));	//初期位置は画面外
+	gameClear = false;
+	if (gamestart = false) {
+		// 迷路作成中
+		// 各アクターを迷路作成中は画面外におく。
+		GetGame()->brave->SetPosition(Vector2(-100.0f, -100.0f));	//初期位置は画面外
+		GetGame()->shadow->SetPosition(Vector2(-100.0f, -100.0f));	//初期位置は画面外
+		GetGame()->shadow->SetDir(1);
+		for (int i = 0; i < mapWidth; i++) {
+			for (int j = 0; j < mapHeight; j++) {
+				GetGame()->tiles[i][j]->SetTileState(Tile::EDefault);
+				GetGame()->tiles[i][j]->SetPosition(Vector2(-100.0f, -100.0f));
+				mapIndex[i][j] = 0;
+			}
+		}
+	}
+	else {
+		// 迷路作成完了
+		// 各アクターの初期位置を設定
+		GetGame()->brave->SetPosition(GetTilePos(sindex));
+		GetGame()->shadow->SetPosition(GetTilePos(sindex));
+		for (int i = 0; i < mapWidth; i++) {
+			for (int j = 0; j < mapHeight; j++) {
+				int index[2] = {i , j};
+				GetGame()->tiles[i][j]->SetPosition(GetTilePos(index));
+				switch (mapIndex[i][j]) {
+					case 1: //壁
+						GetGame()->tiles[i][j]->SetTileState(Tile::EWall);
+						break;
+					default:	//壁以外
+						GetGame()->tiles[i][j]->SetTileState(Tile::EDefault);
+				}
+			}
+		}
+	}
+}
 
 void Maze::GenerateMap()
 {
@@ -43,62 +83,20 @@ void Maze::GenerateMap()
 			for (int j = 0; j < mapHeight; j++) {
 				if (mapIndex[i][j] == 2) {
 					//スタート位置インデックス
-					sxindex = i;
-					syindex = j;
+					sindex[0] = i;
+					sindex[1] = j;
 				}
 				if (mapIndex[i][j] == 3) {
 					//ゴール位置インデックス
-					gxindex = i;
-					gyindex = j;
+					gindex[0] = i;
+					gindex[1] = j;
 				}
 			}
 		}
 		//簡単すぎないかチェック
-		if ((gxindex > static_cast<int>(mapWidth / 2)) && (gyindex > static_cast<int>(mapHeight / 2))) { mazeNG = false; }
+		if ((gindex[0] > static_cast<int>(mapWidth / 2)) && (gindex[1] > static_cast<int>(mapHeight / 2))) { mazeNG = false; }
 	}
-
-	//Tileと主人公のindexとpositionをセット.Active化
-	GetTexSize() * Vector2((i + 1) * 1.0f, (j + 1) * 1.0f));)
-		brave->SetPosition
-	shadow->SetState(EActive);
-	shadow->SetPosition(mTiles[i][j]->GetTexSize() * Vector2((i + 1) * 1.0f, (j + 1) * 1.0f));
-	for (int i = 0; i < mWidth; i++) {
-		for (int j = 0; j < mHeight; j++) {
-			switch (map[i][j]) {
-				case 0:
-					//通路
-					mTiles[i][j]->SetTileState(Tile::EDefault);
-					break;
-				case 1:
-					//壁
-					mTiles[i][j]->SetTileState(Tile::EWall);
-					break;
-				case 2:
-					//スタート
-					mTiles[i][j]->SetTileState(Tile::EStart);
-					brave->SetState(EActive);
-					
-					break;
-				case 3:
-					//ゴール
-					mTiles[i][j]->SetTileState(Tile::EGoal);
-					mTiles[i][j]->GetCircle()->SetRadius(2.0f);
-					break;
-			}
-			mTiles[i][j]->SetState(EActive);
-			mTiles[i][j]->SetPosition(mTiles[i][j]->GetTexSize() * Vector2((i + 1), (j + 1)));
-		}
-
-		
-
-	}
-
-	// Set start/end tiles
-	GetStartTile()->SetTileState(Tile::EStart);
-	GetEndTile()->SetTileState(Tile::EGoal);
-	
-
-	startOk = true;
+	gameStart = true;
 
 	//隣接ノード作成
 	MakeGraphNodes();
@@ -107,25 +105,44 @@ void Maze::GenerateMap()
 	FindPath(GetEndTile(), GetStartTile());
 	UpdatePathTiles(GetStartTile());
 
-	auto st = GetStartTile();
-	shadow->SetPath();
+	GetGame()->shadow->SetPath();
+}
+
+Vector2 Maze::GetTilePos(int index[2])
+{
+	Vector2 pos;
+	pos = mTileSize * Vector2((index[0] + 1) * 1.0f, (index[1] + 1) * 1.0f);
+	return pos;
+}
+
+Tile* Maze::GetStartTile()
+{
+	Tile* tile = GetGame()->tiles[sindex[0]][sindex[1]];
+	return tile;
+}
+
+Tile* Maze::GetEndTile()
+{
+	Tile* tile = GetGame()->tiles[gindex[0]][gindex[1]];
+	return tile;
 }
 
 void Maze::MakeGraphNodes()
 {
+	auto mTiles = GetGame()->tiles;
 	for (int i = 0; i < mTiles.size(); i++) {
 		for (int j = 0; j < mTiles[i].size(); j++) {
-			if (mTiles[i][j]->GetTileState() != Tile::EWall) {
-				if (mTiles[i - 1][j]->GetTileState() != Tile::EWall) {
+			if (mTiles[i][j]->mTileState != Tile::EWall) {
+				if (mTiles[i - 1][j]->mTileState != Tile::EWall) {
 					mTiles[i][j]->mAdjacent.push_back(mTiles[i - 1][j]);
 				}
-				if (mTiles[i + 1][j]->GetTileState() != Tile::EWall) {
+				if (mTiles[i + 1][j]->mTileState != Tile::EWall) {
 					mTiles[i][j]->mAdjacent.push_back(mTiles[i + 1][j]);
 				}
-				if (mTiles[i][j - 1]->GetTileState() != Tile::EWall){
+				if (mTiles[i][j - 1]->mTileState != Tile::EWall){
 					mTiles[i][j]->mAdjacent.push_back(mTiles[i][j - 1]);
 				}
-				if (mTiles[i][j + 1]->GetTileState() != Tile::EWall) {
+				if (mTiles[i][j + 1]->mTileState != Tile::EWall) {
 					mTiles[i][j]->mAdjacent.push_back(mTiles[i][j + 1]);
 				}
 

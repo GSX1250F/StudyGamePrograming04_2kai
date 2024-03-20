@@ -15,21 +15,17 @@ public:
 	};
 
 	Tile(class Game* game);
-	void SetTileState(TileState state);
-	TileState GetTileState() const { return mTileState; }
-	
-	class CircleComponent* GetCircle() { return cc; }
-
-	const Tile* GetParent() const { return mParent; }
-	
-
-private:
-	void UpdateTexture();
 	class SpriteComponent* sc;
-	TileState mTileState;
 	class CircleComponent* cc;
+
+	TileState mTileState;
+	void SetTileState(TileState);
+	float mTexSize;
+
 	std::vector<Tile*> mAdjacent;	//隣接ノード配列
 	Tile* mParent;	//親ノード
+	void UpdateTexture();
+	
 	
 };
 

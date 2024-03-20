@@ -24,7 +24,7 @@ void NavComponent::Update(float deltaTime)
 		Vector2 diff = mOwner->GetPosition() - mNextNode->GetPosition();
 		if (Math::NearZero(diff.Length(), 2.0f))
 		{
-			mNextNode = mNextNode->GetParent();
+			mNextNode = mNextNode->mParent;
 			TurnTo(mNextNode->GetPosition());
 		}
 	}
@@ -34,7 +34,7 @@ void NavComponent::Update(float deltaTime)
 
 void NavComponent::StartPath(const Tile* start)
 {
-	mNextNode = start->GetParent();
+	mNextNode = start->mParent;
 	TurnTo(mNextNode->GetPosition());
 }
 

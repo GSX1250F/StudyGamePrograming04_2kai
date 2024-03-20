@@ -28,12 +28,12 @@ public:
 
 	
 	//Game-specific	
-	class Maze* GetMaze() { return maze; }
-	class Brave* GetBrave() { return brave; }
-	class Shadow* GetShadow() { return shadow; }
-	class MazeClr* GetMazeClr() { return mazeClr; }
-	std::vector<std::vector<Tile*>> GetTiles() { return tiles; }
-	void InitMaze();
+	class Maze* maze;
+	class Brave* brave;
+	class Shadow* shadow;
+	class MazeClr* mazeClr;
+	class Tile* tile;
+	std::vector<std::vector<Tile*>> tiles;
 	
 private:
 	void ProcessInput();
@@ -61,12 +61,6 @@ private:
 	bool mIsUpdatingActors;
 
 	
-	//Game-specific	
-	class Maze* maze;
-	class Brave* brave;
-	class Shadow* shadow;
-	class MazeClr* mazeClr;
-	class Tile* tile;
-	std::vector<std::vector<Tile*>> tiles;
+	
 	
 };

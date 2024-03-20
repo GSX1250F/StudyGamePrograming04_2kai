@@ -7,12 +7,9 @@ public:
 	void UpdateActor(float deltaTime) override;
 	void ActorInput(const uint8_t* keyState) override;
 	
-	class CircleComponent* GetCircle() { return cc; }
-	
-private:
 	class AnimSpriteComponent* asc;
 	class CircleComponent* cc;
-	
+	class MoveComponent* mc;
 	
 };
 
