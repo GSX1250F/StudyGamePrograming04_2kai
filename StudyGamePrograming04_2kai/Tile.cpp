@@ -40,7 +40,7 @@ void Tile::UpdateTexture()
 	switch (mTileState)
 	{
 		case EPath:
-			asc->SetAnimNum(3, 3, false);
+			asc->SetAnimNum(1, 1, false);
 			break;
 		case EWall:
 			asc->SetAnimNum(2, 2, false);

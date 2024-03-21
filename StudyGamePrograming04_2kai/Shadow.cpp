@@ -1,4 +1,5 @@
 #include "Shadow.h"
+#include "Brave.h"
 #include "Game.h"
 #include "Maze.h"
 #include "Tile.h"
@@ -45,45 +46,42 @@ Shadow::Shadow(Game* game) : Actor(game)
 
 	//NavComponent作成
 	nc = new NavComponent(this);
-	nc->SetForwardSpeed(150.0f);
+	nc->SetForwardSpeed(speed);
 	
-	
-	//左手法のとき。初期方向は上
-	//ndir = 1;	//ndir%4 ==0:RIGHT,1:UP,2:LEFT,3:DOWN
-	//turnLeftOk = true;
 }
 
 void Shadow::ActorInput(const uint8_t* keyState)
 {
-	/*
 	if (GetGame()->maze->gameStart == true) {
 		//入力に応じて、アニメーションの設定と移動
-		SetVelocity(Vector2::Zero);
-		float speed = 150.0f;
 		int bg = asc->GetAnimNumBeg();
 		int ed = asc->GetAnimNumLast();
-		if (ndir == 3)	//DOWN
+		float driftang = GetDriftAngle();
+		if ((driftang >= -Math::Pi *0.75f) && (driftang < -Math::Pi * 0.25f))	//DOWN
 		{
 			if (bg != 1 || ed != 4) { asc->SetAnimNum(1, 4, true); }
-			SetVelocity(Vector2(0.0f, speed));
 		}
-		else if (ndir == 1)	//UP
+		else if ((driftang >= Math::Pi * 0.25f) && (driftang < Math::Pi * 0.75f))	//UP
 		{
 			if (bg != 5 || ed != 8) { asc->SetAnimNum(5, 8, true); }
-			SetVelocity(Vector2(0.0f, -speed));
 		}
-		else if (ndir == 0)	//RIGHT
+		else if ((driftang >= -Math::Pi * 0.25f) && (driftang < Math::Pi * 0.25f))	//RIGHT
 		{
 			if (bg != 9 || ed != 12) { asc->SetAnimNum(9, 12, true); }
-			SetVelocity(Vector2(speed, 0.0f));
 		}
-		else if (ndir == 2)	//LEFT
+		else if (((driftang >= -Math::Pi * 0.75f) && (driftang < Math::Pi)) || ((driftang >= -Math::Pi) && (driftang < -Math::Pi *0.75)))	//LEFT
 		{
 			if (bg != 13 || ed != 16) { asc->SetAnimNum(13, 16, true); }
-			SetVelocity(Vector2(-speed, 0.0f));
+		}
+
+		if (keyState[SDL_SCANCODE_R]) {
+			//迷路をリセットするとき、スピードを上げる。
+			speed += 5.0f;
+			if (speed > GetGame()->brave->speed * 0.9f) { speed = GetGame()->brave->speed * 0.9f; }
+			nc->SetForwardSpeed(speed);
 		}
 	}
-	*/
+	
 }
 
 void Shadow::UpdateActor(float deltaTime)

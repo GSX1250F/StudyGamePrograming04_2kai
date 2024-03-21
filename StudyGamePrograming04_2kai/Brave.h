@@ -11,5 +11,6 @@ public:
 	class CircleComponent* cc;
 	class MoveComponent* mc;
 
+	float speed = 150.0f;
 };
 

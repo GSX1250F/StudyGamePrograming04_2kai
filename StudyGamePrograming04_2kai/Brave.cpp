@@ -52,22 +52,22 @@ void Brave::ActorInput(const uint8_t* keyState){
 		if (keyState[SDL_SCANCODE_DOWN]){
 			if (bg != 1 || ed != 4) { asc->SetAnimNum(1, 4, true); }
 			SetDriftAngle(-Math::Pi / 2.0f);
-			mc->SetForwardSpeed(150.0f);
+			mc->SetForwardSpeed(speed);
 		}
 		else if (keyState[SDL_SCANCODE_UP]){
 			if (bg != 5 || ed != 8) { asc->SetAnimNum(5, 8, true); }
 			SetDriftAngle(Math::Pi / 2.0f);
-			mc->SetForwardSpeed(150.0f);
+			mc->SetForwardSpeed(speed);
 		}
 		else if (keyState[SDL_SCANCODE_RIGHT]){
 			if (bg != 9 || ed != 12) { asc->SetAnimNum(9, 12, true); }
 			SetDriftAngle(0.0f);
-			mc->SetForwardSpeed(150.0f);
+			mc->SetForwardSpeed(speed);
 		}
 		else if (keyState[SDL_SCANCODE_LEFT]){
 			if (bg != 13 || ed != 16) { asc->SetAnimNum(13, 16, true); }
 			SetDriftAngle(Math::Pi);
-			mc->SetForwardSpeed(150.0f);
+			mc->SetForwardSpeed(speed);
 		}
 		else {
 			mc->SetForwardSpeed(0.0f);

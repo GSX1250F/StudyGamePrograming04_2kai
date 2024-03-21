@@ -25,7 +25,7 @@ void NavComponent::Update(float deltaTime)
 		if (Math::NearZero(diff.Length(), 2.0f))
 		{
 			mNextNode = mNextNode->mParent;
-			TurnTo(mNextNode->GetPosition());
+			if (mNextNode) { TurnTo(mNextNode->GetPosition()); }
 		}
 	}
 	

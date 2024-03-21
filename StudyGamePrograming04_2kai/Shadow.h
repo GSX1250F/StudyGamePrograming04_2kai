@@ -11,14 +11,10 @@ public:
 	class CircleComponent* cc;
 	class NavComponent* nc;
 
-	Vector2 GetIndex();
-	Vector2 GetIndex2();
-	//void SetDir(int n) { ndir = n; }
 	class Tile* tile;
 	void SetPath();
 
-	// for NavComponent
-	bool turnLeftOk;		//左手法用。左手が空いたとき、次に左が壁になるまでfalse
-	int nindex[2];			//次に向かうタイルのインデックス
+	float speed = 75.0f;
+
 };
 
