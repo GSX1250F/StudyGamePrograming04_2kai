@@ -55,10 +55,11 @@ Shadow::Shadow(Game* game) : Actor(game)
 
 void Shadow::ActorInput(const uint8_t* keyState)
 {
+	/*
 	if (GetGame()->maze->gameStart == true) {
 		//入力に応じて、アニメーションの設定と移動
 		SetVelocity(Vector2::Zero);
-		float speed = 400.0f;
+		float speed = 150.0f;
 		int bg = asc->GetAnimNumBeg();
 		int ed = asc->GetAnimNumLast();
 		if (ndir == 3)	//DOWN
@@ -82,6 +83,7 @@ void Shadow::ActorInput(const uint8_t* keyState)
 			SetVelocity(Vector2(-speed, 0.0f));
 		}
 	}
+	*/
 }
 
 void Shadow::UpdateActor(float deltaTime)
@@ -114,94 +116,8 @@ void Shadow::UpdateActor(float deltaTime)
 		}
 	
 		// 左手法を実装。
-		// 前が壁だったとき、右方向にVelocityを変更。
-		// 左手が空いていたら左方向にVelocityを変更し、再び左手が壁になるまで前進。
-		Vector2 index = GetIndex2();
-		Vector2 indexDN = index - Vector2(static_cast<int>(index.x), static_cast<int>(index.y));
-		if ((indexDN.x <= 0.25f || indexDN.x >= 0.75f)&& (indexDN.y <= 0.25f || indexDN.y >= 0.75f))
-		{
-			switch (ndir)
-			{
-				case 0:	//右向き
-					//左が空いているとき
-					if (GetGame()->tiles[std::round(index.x)][std::round(index.y) - 1]->mTileState != Tile::EWall)
-					{
-						if (turnLeftOk) {
-							ndir = (ndir + 1) % 4;	//向かって左を向く 
-							turnLeftOk = false;		//次に左が壁になるまでfalse
-						}
-					}
-					// 左が壁のとき
-					else {
-						turnLeftOk = true;	//左が壁だったら次曲がって良し
-						// 前方が壁のとき
-						if (GetGame()->tiles[std::round(index.x) + 1][std::round(index.y)]->mTileState == Tile::EWall)
-						{
-							ndir = (ndir + 3) % 4;	//向かって右を向く 
-						}
-					}
-					break;
-
-				case 1:	//上向き
-					//左が空いているとき
-					if (GetGame()->tiles[std::round(index.x) - 1][std::round(index.y)]->mTileState != Tile::EWall)
-					{
-						if (turnLeftOk) {
-							ndir = (ndir + 1) % 4;	//向かって左を向く 
-							turnLeftOk = false;		//次に左が壁になるまでfalse
-						}
-					}
-					// 左が壁のとき
-					else {
-						turnLeftOk = true;	//左が壁だったら次曲がって良し
-						// 前方が壁のとき
-						if (GetGame()->tiles[std::round(index.x)][std::round(index.y) - 1]->mTileState == Tile::EWall)
-						{
-							ndir = (ndir + 3) % 4;	//向かって右を向く 
-						}
-					}
-					break;
-
-				case 2:	//左向き
-					//左が空いているとき
-					if (GetGame()->tiles[std::round(index.x)][std::round(index.y) + 1]->mTileState != Tile::EWall)
-					{
-						if (turnLeftOk) {
-							ndir = (ndir + 1) % 4;	//向かって左を向く 
-							turnLeftOk = false;		//次に左が壁になるまでfalse
-						}
-					}
-					// 左が壁のとき
-					else {
-						turnLeftOk = true;	//左が壁だったら次曲がって良し
-						// 前方が壁のとき
-						if (GetGame()->tiles[std::round(index.x) - 1][std::round(index.y)]->mTileState == Tile::EWall)
-						{
-							ndir = (ndir + 3) % 4;	//向かって右を向く 
-						}
-					}
-					break;
-				case 3:	//下向き
-					//左が空いているとき
-					if (GetGame()->tiles[std::round(index.x) + 1][std::round(index.y)]->mTileState != Tile::EWall)
-					{
-						if (turnLeftOk) {
-							ndir = (ndir + 1) % 4;	//向かって左を向く 
-							turnLeftOk = false;		//次に左が壁になるまでfalse
-						}
-					}
-					// 左が壁のとき
-					else {
-						turnLeftOk = true;	//左が壁だったら次曲がって良し
-						// 前方が壁のとき
-						if (GetGame()->tiles[std::round(index.x)][std::round(index.y) + 1]->mTileState == Tile::EWall)
-						{
-							ndir = (ndir - 1) % 4;	//向かって右を向く 
-						}
-					}
-					break;
-			}
-		}
+		// 前が壁だったとき、右方向にターゲットタイルを変更。
+		// 左手が空いていたら左方向にターゲットタイルを変更し、再び左手が壁になるまで前進。
 		
 
 		//ゴール判定

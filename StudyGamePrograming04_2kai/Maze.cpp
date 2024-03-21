@@ -61,7 +61,7 @@ void Maze::InitMaze(bool gamestart)
 		GetGame()->brave->SetPosition(Vector2(-100.0f, -100.0f));	//初期位置は画面外
 		GetGame()->shadow->SetPosition(Vector2(-100.0f, -100.0f));	//初期位置は画面外
 		GetGame()->treasure->SetPosition(Vector2(-100.0f, -100.0f));	//初期位置は画面外
-		GetGame()->shadow->SetDir(1);
+		//GetGame()->shadow->SetDir(1);
 		for (int i = 0; i < mapWidth; i++) {
 			for (int j = 0; j < mapHeight; j++) {
 				GetGame()->tiles[i][j]->SetTileState(Tile::EDefault);
@@ -166,87 +166,6 @@ void Maze::MakeGraphNodes(std::vector<std::vector<Tile*>> &tiles)
 
 bool Maze::FindPath(Tile* start, Tile* goal)
 {
-	/*
-	// Implements A* pathfinding
-	for (int i = 0; i < mWidth; i++)
-	{
-		for (int j = 0; j < mHeight; j++)
-		{
-			mTiles[i][j]->g = 0.0f;
-			mTiles[i][j]->mInOpenSet = false;
-			mTiles[i][j]->mInClosedSet = false;
-		}
-	}
-
-	std::vector<Tile*> openSet;
-
-	// Set current node to start, and add to closed set
-	Tile* current = start;
-	current->mInClosedSet = true;
-
-	do
-	{
-		// Add adjacent nodes to open set
-		for (Tile* neighbor : current->mAdjacent)
-		{
-			if (neighbor->mBlocked)
-			{
-				continue;
-			}
-
-			// Only check nodes that aren't in the closed set
-			if (!neighbor->mInClosedSet)
-			{
-				if (!neighbor->mInOpenSet)
-				{
-					// Not in the open set, so set parent
-					neighbor->mParent = current;
-					neighbor->h = (neighbor->GetPosition() - goal->GetPosition()).Length();
-					// g(x) is the parent's g plus cost of traversing edge
-					neighbor->g = current->g + TileSize;
-					neighbor->f = neighbor->g + neighbor->h;
-					openSet.emplace_back(neighbor);
-					neighbor->mInOpenSet = true;
-				}
-				else
-				{
-					// Compute g(x) cost if current becomes the parent
-					float newG = current->g + TileSize;
-					if (newG < neighbor->g)
-					{
-						// Adopt this node
-						neighbor->mParent = current;
-						neighbor->g = newG;
-						// f(x) changes because g(x) changes
-						neighbor->f = neighbor->g + neighbor->h;
-					}
-				}
-			}
-		}
-
-		// If open set is empty, all possible paths are exhausted
-		if (openSet.empty())
-		{
-			break;
-		}
-
-		// Find lowest cost node in open set
-		auto iter = std::min_element(openSet.begin(), openSet.end(),
-			[](Tile* a, Tile* b) {
-				return a->f < b->f;
-			});
-		// Set to current and move from open to closed
-		current = *iter;
-		openSet.erase(iter);
-		current->mInOpenSet = false;
-		current->mInClosedSet = true;
-	} while (current != goal);
-
-	// Did we find a path?
-	return (current == goal) ? true : false;
-	*/
-
-
 	// Implements BFS pathfinding
 
 	// ノードから親へのマップ
