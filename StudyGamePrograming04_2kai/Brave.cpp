@@ -10,6 +10,7 @@
 #include "MoveComponent.h"
 
 
+
 Brave::Brave(Game* game) : Actor(game){
 	// アニメーションのスプライトコンポーネントを作成
 	asc = new AnimSpriteComponent(this, 40);
@@ -39,30 +40,39 @@ Brave::Brave(Game* game) : Actor(game){
 
 	//MoveComponent作成
 	mc = new MoveComponent(this);
+
+	
 }
 
 void Brave::ActorInput(const uint8_t* keyState){
 	if (GetGame()->maze->gameStart == true) {
 		//入力に応じて、アニメーションの設定と移動
-		SetVelocity(Vector2::Zero);		//速度リセット
 		int bg = asc->GetAnimNumBeg();
 		int ed = asc->GetAnimNumLast();
 		if (keyState[SDL_SCANCODE_DOWN]){
 			if (bg != 1 || ed != 4) { asc->SetAnimNum(1, 4, true); }
-			SetVelocity(Vector2(0.0f, 150.0f));
+			SetDriftAngle(-Math::Pi / 2.0f);
+			mc->SetForwardSpeed(150.0f);
 		}
 		else if (keyState[SDL_SCANCODE_UP]){
 			if (bg != 5 || ed != 8) { asc->SetAnimNum(5, 8, true); }
-			SetVelocity(Vector2(0.0f, -150.0f));
+			SetDriftAngle(Math::Pi / 2.0f);
+			mc->SetForwardSpeed(150.0f);
 		}
 		else if (keyState[SDL_SCANCODE_RIGHT]){
 			if (bg != 9 || ed != 12) { asc->SetAnimNum(9, 12, true); }
-			SetVelocity(Vector2(150.0f, 0.0f));
+			SetDriftAngle(0.0f);
+			mc->SetForwardSpeed(150.0f);
 		}
 		else if (keyState[SDL_SCANCODE_LEFT]){
 			if (bg != 13 || ed != 16) { asc->SetAnimNum(13, 16, true); }
-			SetVelocity(Vector2(-150.0f, 0.0f));
+			SetDriftAngle(Math::Pi);
+			mc->SetForwardSpeed(150.0f);
 		}
+		else {
+			mc->SetForwardSpeed(0.0f);
+		}
+
 	}
 	
 }

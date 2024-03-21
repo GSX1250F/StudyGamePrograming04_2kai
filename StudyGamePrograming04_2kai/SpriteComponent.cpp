@@ -34,8 +34,7 @@ void SpriteComponent::Draw(SDL_Renderer* renderer)
 			mTexture,									// 描画したいテクスチャ
 			nullptr,									// 描画したいテクスチャの範囲
 			&r,											// 出力先の矩形
-			-Math::ToDegrees(mOwner->GetSpin()),	// 変換された回転角
-			//-Math::ToDegrees(mOwner->GetRotation()),	// 変換された回転角
+			-Math::ToDegrees(mOwner->GetRotation()),	// 変換された回転角
 			nullptr,									// 回転中心
 			SDL_FLIP_NONE);
 	}

@@ -14,8 +14,8 @@
 
 Maze::Maze(Game* game) : Actor(game)
 {
-	mapWidth = 51;
-	mapHeight = 29;
+	mapWidth = 7;
+	mapHeight = 7;
 	//‰¡•Ac•‚ğ‚Æ‚à‚É7ˆÈã‚ÌŠï”‚É‚·‚éB
 	while (mapWidth < 7 || mapWidth % 2 == 0) {	mapWidth++;}
 	while (mapHeight < 7 || mapHeight % 2 == 0) { mapHeight++; }
@@ -48,7 +48,7 @@ void Maze::ResetMaze()
 	FindPath(GetEndTile(), GetStartTile());
 	UpdatePathTiles(GetStartTile());
 
-	//GetGame()->shadow->SetPath();
+	GetGame()->shadow->SetPath();
 }
 
 void Maze::InitMaze(bool gamestart)

@@ -41,11 +41,11 @@ Shadow::Shadow(Game* game) : Actor(game)
 	cc->SetRadius(asc->GetTexWidth() / 2.0f);
 
 	//MoveComponent作成
-	MoveComponent* mc = new MoveComponent(this);
+	//MoveComponent* mc = new MoveComponent(this);
 
 	//NavComponent作成
-	//nc = new NavComponent(this);
-	//nc->SetForwardSpeed(150.0f);
+	nc = new NavComponent(this);
+	nc->SetForwardSpeed(150.0f);
 	
 	
 	//左手法のとき。初期方向は上
@@ -109,17 +109,9 @@ void Shadow::UpdateActor(float deltaTime)
 				}
 			}
 
-			//ゴール判定
-			if (Intersect(*cc, *(GetGame()->treasure->cc))) {
-				GetGame()->maze->gameClear = true;
-			}
+			
 		}
-	
-		// 左手法を実装。
-		// 前が壁だったとき、右方向にターゲットタイルを変更。
-		// 左手が空いていたら左方向にターゲットタイルを変更し、再び左手が壁になるまで前進。
 		
-
 		//ゴール判定
 		if (Intersect(*cc, *(GetGame()->maze->GetEndTile()->cc))) {
 			GetGame()->maze->gameClear = true;
@@ -129,7 +121,7 @@ void Shadow::UpdateActor(float deltaTime)
 
 	
 }
-
+/*
 Vector2 Shadow::GetIndex()
 {
 	//四捨五入版
@@ -145,7 +137,7 @@ Vector2 Shadow::GetIndex2()
 	float yindex = GetPosition().y / GetGame()->tiles[0][0]->asc->GetTexWidth() - 1.0f;
 	return Vector2(xindex, yindex);	
 }
-
+*/
 void Shadow::SetPath()
 {
 	nc->StartPath(GetGame()->maze->GetStartTile());

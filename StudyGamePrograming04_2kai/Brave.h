@@ -10,6 +10,6 @@ public:
 	class AnimSpriteComponent* asc;
 	class CircleComponent* cc;
 	class MoveComponent* mc;
-	
+
 };
 

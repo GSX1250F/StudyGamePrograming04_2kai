@@ -45,5 +45,5 @@ void NavComponent::TurnTo(const Vector2& pos)
 	// New angle is just atan2 of this dir vector
 	// (Negate y because +y is down on screen)
 	float angle = Math::Atan2(-dir.y, dir.x);
-	mOwner->SetRotation(angle);
+	mOwner->SetDriftAngle(angle);		//Rotation → DriftAngleに変更。スプライトの向きを変えない。
 }

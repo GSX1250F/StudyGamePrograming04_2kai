@@ -21,6 +21,6 @@ public:
 	void SetAngularSpeed(float speed) { mAngularSpeed = speed; }
 	void SetForwardSpeed(float speed) { mForwardSpeed = speed; }
 private:
-	float mAngularSpeed;
-	float mForwardSpeed;
+	float mAngularSpeed;		// 運動＆スプライトの方向角速度
+	float mForwardSpeed;		// 進行方向速度
 };

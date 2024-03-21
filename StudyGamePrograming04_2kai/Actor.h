@@ -30,19 +30,13 @@ public:
 
 	// Getters/setters
 	const Vector2& GetPosition() const { return mPosition; }
-	const Vector2& GetVelocity() const { return mVelocity; }		//速度ゲッターを追加
 	void SetPosition(const Vector2& pos) { mPosition = pos; }
-	void SetVelocity(const Vector2& vel) { mVelocity = vel; }		//速度セッターを追加
 	float GetScale() const { return mScale; }
 	void SetScale(float scale) { mScale = scale; }
 	float GetRotation() const { return mRotation; }
 	void SetRotation(float rotation) { mRotation = rotation; }
 
-	Vector2 GetForward() const { return Vector2(Math::Cos(mSpin), -Math::Sin(mSpin)); }		//単位ベクトル方向を取得
-
-	float GetSpin() const { return mSpin; }				//スピンゲッターを追加
-	void SetSpin(float spin) { mSpin = spin; }			//スピンセッターを追加
-
+	Vector2 GetForward() const { return Vector2(Math::Cos(mRotation + mDriftAngle), -Math::Sin(mRotation + mDriftAngle)); }
 
 	State GetState() const { return mState; }
 	void SetState(State state) { mState = state; }
@@ -54,19 +48,23 @@ public:
 	void AddComponent(class Component* component);
 	void RemoveComponent(class Component* component);
 
+	//オリジナル
+	//Vector2 GetDriftForward() const { return Vector2(Math::Cos(mDriftAngle), -Math::Sin(mDriftAngle)); }
+	float GetDriftAngle() const { return mDriftAngle; }
+	void SetDriftAngle(float angle) { mDriftAngle = angle; }
 private:
 	// アクターの状態
 	State mState;
 
 	// 移動
 	Vector2 mPosition;		//位置x,y
-	Vector2 mVelocity;		//速度x,y
 	float mScale;			//大きさ
-	float mRotation;		//運動方向 (rad)
-
-	// 回転のみ
-	float mSpin;			//回転方向 (rad)
-
+	float mRotation;		//スプライト方向 (rad)
+	
 	std::vector<class Component*> mComponents;
 	class Game* mGame;
+
+	//オリジナル
+	float mDriftAngle;		//スプライト方向を変えないアクター方向（rad）
+
 };
